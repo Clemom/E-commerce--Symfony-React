@@ -27,7 +27,7 @@ class Item
     #[ORM\Column(type: "string", enumType: ItemType::class)]
     private ItemType $type;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "items")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
 
@@ -95,6 +95,9 @@ class Item
 
     public function setCart(?Cart $cart): static
     {
+        if ($cart !== null) {
+            $this->order = null;
+        }
         $this->cart = $cart;
         return $this;
     }
@@ -106,6 +109,9 @@ class Item
 
     public function setOrder(?Order $order): static
     {
+        if ($order !== null) {
+            $this->cart = null;
+        }
         $this->order = $order;
         return $this;
     }
