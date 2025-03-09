@@ -2,13 +2,11 @@
 
 namespace App\Entity;
 
-use App\Enum\CronFrequency;
-use App\Repository\CRONStatsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Statistics;
+use App\Repository\CRONStatsRepository;
 
 #[ORM\Entity(repositoryClass: CRONStatsRepository::class)]
 class CRONStats
@@ -30,8 +28,8 @@ class CRONStats
     #[ORM\Column(length: 50)]
     private ?string $status = null;
 
-    #[ORM\Column(type: "string", enumType: CronFrequency::class)]
-    private CronFrequency $frequency;
+    #[ORM\Column(length: 255)]
+    private ?string $frequency = null;
 
     #[ORM\OneToMany(targetEntity: Statistics::class, mappedBy: "cronStats", orphanRemoval: true)]
     private Collection $statistics;
@@ -90,20 +88,17 @@ class CRONStats
         return $this;
     }
 
-    public function getFrequency(): CronFrequency
+    public function getFrequency(): ?string
     {
         return $this->frequency;
     }
 
-    public function setFrequency(CronFrequency $frequency): static
+    public function setFrequency(string $frequency): static
     {
         $this->frequency = $frequency;
         return $this;
     }
 
-    /**
-     * @return Collection<int, Statistics>
-     */
     public function getStatistics(): Collection
     {
         return $this->statistics;

@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Product;
+use App\Repository\CategoryRepository;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -26,7 +25,7 @@ class Category
     #[ORM\Column]
     private ?bool $is_active = null;
 
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: "categories")]
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: "category")]
     private Collection $products;
 
     public function __construct()
@@ -72,9 +71,6 @@ class Category
         return $this;
     }
 
-    /**
-     * @return Collection<int, Product>
-     */
     public function getProducts(): Collection
     {
         return $this->products;
@@ -84,7 +80,7 @@ class Category
     {
         if (!$this->products->contains($product)) {
             $this->products->add($product);
-            $product->addCategory($this);
+            $product->setCategory($this);
         }
         return $this;
     }
@@ -92,7 +88,9 @@ class Category
     public function removeProduct(Product $product): static
     {
         if ($this->products->removeElement($product)) {
-            $product->removeCategory($this);
+            if ($product->getCategory() === $this) {
+                $product->setCategory(null);
+            }
         }
         return $this;
     }

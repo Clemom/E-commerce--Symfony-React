@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Enum\UserRole;
-use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use App\Enum\UserRole;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -36,7 +36,7 @@ class User
     private ?\DateTimeInterface $registration_date = null;
 
     #[ORM\Column]
-    private bool $is_active = true;
+    private ?bool $is_active = true;
 
     #[ORM\Column(type: "string", enumType: UserRole::class)]
     private UserRole $role;
@@ -48,12 +48,13 @@ class User
     private Collection $carts;
 
     #[ORM\OneToMany(targetEntity: ActivityLog::class, mappedBy: "user", orphanRemoval: true)]
-    private Collection $activityLogs;
+    private Collection $logs;
 
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->carts = new ArrayCollection();
+        $this->logs = new ArrayCollection();
         $this->registration_date = new \DateTime();
     }
 
@@ -128,7 +129,7 @@ class User
         return $this;
     }
 
-    public function isActive(): bool
+    public function isActive(): ?bool
     {
         return $this->is_active;
     }
@@ -150,81 +151,18 @@ class User
         return $this;
     }
 
-    /**
-     * @return Collection<int, Order>
-     */
     public function getOrders(): Collection
     {
         return $this->orders;
     }
 
-    public function addOrder(Order $order): static
-    {
-        if (!$this->orders->contains($order)) {
-            $this->orders->add($order);
-            $order->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeOrder(Order $order): static
-    {
-        if ($this->orders->removeElement($order)) {
-            if ($order->getUser() === $this) {
-                $order->setUser(null);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Cart>
-     */
     public function getCarts(): Collection
     {
         return $this->carts;
     }
 
-    public function addCart(Cart $cart): static
+    public function getLogs(): Collection
     {
-        if (!$this->carts->contains($cart)) {
-            $this->carts->add($cart);
-            $cart->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeCart(Cart $cart): static
-    {
-        if ($this->carts->removeElement($cart)) {
-            if ($cart->getUser() === $this) {
-                $cart->setUser(null);
-            }
-        }
-        return $this;
-    }
-
-    public function getActivityLogs(): Collection
-    {
-        return $this->activityLogs;
-    }
-
-    public function addActivityLog(ActivityLog $log): static
-    {
-        if (!$this->activityLogs->contains($log)) {
-            $this->activityLogs->add($log);
-            $log->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeActivityLog(ActivityLog $log): static
-    {
-        if ($this->activityLogs->removeElement($log)) {
-            if ($log->getUser() === $this) {
-                $log->setUser(null);
-            }
-        }
-        return $this;
+        return $this->logs;
     }
 }

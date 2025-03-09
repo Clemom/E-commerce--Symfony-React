@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use App\Enum\CartStatus;
-use App\Repository\CartRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\CartRepository;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 class Cart
@@ -20,8 +19,8 @@ class Cart
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: "string", enumType: CartStatus::class)]
-    private CartStatus $status;
+    #[ORM\Column]
+    private ?bool $status = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "carts")]
     #[ORM\JoinColumn(nullable: false)]
@@ -32,6 +31,7 @@ class Cart
 
     public function __construct()
     {
+        $this->items = new ArrayCollection();
         $this->created_at = new \DateTime();
     }
 
@@ -51,12 +51,12 @@ class Cart
         return $this;
     }
 
-    public function getStatus(): CartStatus
+    public function isStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus(CartStatus $status): static
+    public function setStatus(bool $status): static
     {
         $this->status = $status;
         return $this;
@@ -96,5 +96,4 @@ class Cart
         }
         return $this;
     }
-
 }

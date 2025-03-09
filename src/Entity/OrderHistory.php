@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Enum\OrderStatus;
-use App\Repository\OrderHistoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Order;
+use App\Repository\OrderHistoryRepository;
 
 #[ORM\Entity(repositoryClass: OrderHistoryRepository::class)]
 class OrderHistory
@@ -19,11 +19,11 @@ class OrderHistory
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $modification_date = null;
 
-    #[ORM\Column(type: "string", enumType: OrderStatus::class)]
-    private OrderStatus $previous_status;
+    #[ORM\Column(length: 255)]
+    private ?string $previous_status = null;
 
-    #[ORM\Column(type: "string", enumType: OrderStatus::class)]
-    private OrderStatus $new_status;
+    #[ORM\Column(length: 255)]
+    private ?string $new_status = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
@@ -53,23 +53,23 @@ class OrderHistory
         return $this;
     }
 
-    public function getPreviousStatus(): OrderStatus
+    public function getPreviousStatus(): ?string
     {
         return $this->previous_status;
     }
 
-    public function setPreviousStatus(OrderStatus $previous_status): static
+    public function setPreviousStatus(string $previous_status): static
     {
         $this->previous_status = $previous_status;
         return $this;
     }
 
-    public function getNewStatus(): OrderStatus
+    public function getNewStatus(): ?string
     {
         return $this->new_status;
     }
 
-    public function setNewStatus(OrderStatus $new_status): static
+    public function setNewStatus(string $new_status): static
     {
         $this->new_status = $new_status;
         return $this;

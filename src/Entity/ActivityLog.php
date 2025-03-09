@@ -2,11 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\ActivityLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
-use App\Entity\ActionType;
+use App\Repository\ActivityLogRepository;
 
 #[ORM\Entity(repositoryClass: ActivityLogRepository::class)]
 class ActivityLog
@@ -28,17 +26,17 @@ class ActivityLog
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $user_agent = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "activityLogs")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "logs")]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: ActionType::class, inversedBy: "logs")]
+    #[ORM\ManyToOne(targetEntity: ActionType::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ActionType $actionType = null;
+    private ?ActionType $action_type = null;
 
     public function __construct()
     {
-        $this->action_date = new \DateTime(); // Initialise la date de l'action
+        $this->action_date = new \DateTime();
     }
 
     public function getId(): ?int
@@ -103,12 +101,12 @@ class ActivityLog
 
     public function getActionType(): ?ActionType
     {
-        return $this->actionType;
+        return $this->action_type;
     }
 
-    public function setActionType(?ActionType $actionType): static
+    public function setActionType(?ActionType $action_type): static
     {
-        $this->actionType = $actionType;
+        $this->action_type = $action_type;
         return $this;
     }
 }

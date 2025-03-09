@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Enum\OrderStatus;
-use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\OrderRepository;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
-#[ORM\Table(name: '`order`')]
 class Order
 {
     #[ORM\Id]
@@ -24,16 +22,28 @@ class Order
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?float $total_amount = null;
 
-    #[ORM\Column(type: "string", enumType: OrderStatus::class)]
-    private OrderStatus $status;
+    #[ORM\Column(length: 50)]
+    private ?string $status = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "orders")]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\OneToMany(targetEntity: Item::class, mappedBy: "order", orphanRemoval: true)]
+    private Collection $items;
+
+    #[ORM\OneToOne(targetEntity: Payment::class, mappedBy: "order", cascade: ["persist", "remove"])]
+    private ?Payment $payment = null;
+
     #[ORM\OneToMany(targetEntity: OrderHistory::class, mappedBy: "order", orphanRemoval: true)]
     private Collection $histories;
 
+    public function __construct()
+    {
+        $this->items = new ArrayCollection();
+        $this->histories = new ArrayCollection();
+        $this->order_date = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -62,12 +72,12 @@ class Order
         return $this;
     }
 
-    public function getStatus(): OrderStatus
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(OrderStatus $status): static
+    public function setStatus(string $status): static
     {
         $this->status = $status;
         return $this;
@@ -81,6 +91,41 @@ class Order
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(Item $item): static
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setOrder($this);
+        }
+        return $this;
+    }
+
+    public function removeItem(Item $item): static
+    {
+        if ($this->items->removeElement($item)) {
+            if ($item->getOrder() === $this) {
+                $item->setOrder(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getPayment(): ?Payment
+    {
+        return $this->payment;
+    }
+
+    public function setPayment(?Payment $payment): static
+    {
+        $this->payment = $payment;
         return $this;
     }
 
@@ -107,5 +152,4 @@ class Order
         }
         return $this;
     }
-
 }

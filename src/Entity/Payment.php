@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Enum\PaymentStatus;
-use App\Repository\PaymentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Order;
+use App\Repository\PaymentRepository;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 class Payment
@@ -28,8 +28,8 @@ class Payment
     #[ORM\Column(length: 100)]
     private ?string $transaction_reference = null;
 
-    #[ORM\Column(type: "string", enumType: PaymentStatus::class)]
-    private PaymentStatus $payment_status;
+    #[ORM\Column(length: 255)]
+    private ?string $payment_status = null;
 
     #[ORM\OneToOne(targetEntity: Order::class, inversedBy: "payment")]
     #[ORM\JoinColumn(nullable: false)]
@@ -84,12 +84,12 @@ class Payment
         return $this;
     }
 
-    public function getPaymentStatus(): PaymentStatus
+    public function getPaymentStatus(): ?string
     {
         return $this->payment_status;
     }
 
-    public function setPaymentStatus(PaymentStatus $payment_status): static
+    public function setPaymentStatus(string $payment_status): static
     {
         $this->payment_status = $payment_status;
         return $this;

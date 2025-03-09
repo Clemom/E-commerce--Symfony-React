@@ -2,13 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Category;
-use App\Entity\Item;
+use App\Repository\ProductRepository;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -36,16 +34,15 @@ class Product
     #[ORM\Column]
     private ?bool $is_active = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: "products")]
-    #[ORM\JoinTable(name: "product_category")]
-    private Collection $categories;
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
     #[ORM\OneToMany(targetEntity: Item::class, mappedBy: "product", orphanRemoval: true)]
     private Collection $items;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
         $this->items = new ArrayCollection();
     }
 
@@ -120,34 +117,17 @@ class Product
         return $this;
     }
 
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getCategories(): Collection
+    public function getCategory(): ?Category
     {
-        return $this->categories;
+        return $this->category;
     }
 
-    public function addCategory(Category $category): static
+    public function setCategory(?Category $category): static
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->addProduct($this);
-        }
+        $this->category = $category;
         return $this;
     }
 
-    public function removeCategory(Category $category): static
-    {
-        if ($this->categories->removeElement($category)) {
-            $category->removeProduct($this);
-        }
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Item>
-     */
     public function getItems(): Collection
     {
         return $this->items;

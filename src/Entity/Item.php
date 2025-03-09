@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Enum\ItemType;
-use App\Repository\ItemRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Product;
-use App\Entity\Cart;
-use App\Entity\Order;
+use App\Repository\ItemRepository;
+use App\Enum\ItemType;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
@@ -96,7 +95,7 @@ class Item
     public function setCart(?Cart $cart): static
     {
         if ($cart !== null) {
-            $this->order = null;
+            $this->order = null; // Un item ne peut pas être dans un panier et une commande en même temps
         }
         $this->cart = $cart;
         return $this;
@@ -110,7 +109,7 @@ class Item
     public function setOrder(?Order $order): static
     {
         if ($order !== null) {
-            $this->cart = null;
+            $this->cart = null; // Un item ne peut pas être dans une commande et un panier en même temps
         }
         $this->order = $order;
         return $this;
