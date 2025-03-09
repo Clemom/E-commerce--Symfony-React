@@ -17,7 +17,7 @@ class Payment
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?float $amount = null;
+    private ?string $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $payment_date = null;
@@ -42,12 +42,12 @@ class Payment
 
     public function getAmount(): ?float
     {
-        return $this->amount;
+        return $this->amount !== null ? (float) $this->amount : null;
     }
 
     public function setAmount(float $amount): static
     {
-        $this->amount = $amount;
+        $this->amount = (string) $amount;
         return $this;
     }
 

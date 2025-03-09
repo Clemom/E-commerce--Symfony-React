@@ -23,7 +23,7 @@ class Product
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?float $price = null;
+    private ?string $price = null;
 
     #[ORM\Column]
     private ?int $stock = null;
@@ -35,7 +35,7 @@ class Product
     private ?bool $is_active = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Category $category = null;
 
     #[ORM\OneToMany(targetEntity: Item::class, mappedBy: "product", orphanRemoval: true)]
@@ -75,12 +75,12 @@ class Product
 
     public function getPrice(): ?float
     {
-        return $this->price;
+        return $this->price !== null ? (float) $this->price : null;
     }
 
     public function setPrice(float $price): static
     {
-        $this->price = $price;
+        $this->price = (string) $price;
         return $this;
     }
 

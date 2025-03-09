@@ -20,7 +20,7 @@ class Order
     private ?\DateTimeInterface $order_date = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?float $total_amount = null;
+    private ?string $total_amount = null;
 
     #[ORM\Column(length: 50)]
     private ?string $status = null;
@@ -63,12 +63,12 @@ class Order
 
     public function getTotalAmount(): ?float
     {
-        return $this->total_amount;
+        return $this->total_amount !== null ? (float) $this->total_amount : null;
     }
 
     public function setTotalAmount(float $total_amount): static
     {
-        $this->total_amount = $total_amount;
+        $this->total_amount = (string) $total_amount;
         return $this;
     }
 

@@ -21,7 +21,7 @@ class Item
     private ?int $quantity = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?float $unit_price = null;
+    private ?string $unit_price = null;
 
     #[ORM\Column(type: "string", enumType: ItemType::class)]
     private ItemType $type;
@@ -56,12 +56,12 @@ class Item
 
     public function getUnitPrice(): ?float
     {
-        return $this->unit_price;
+        return $this->unit_price !== null ? (float) $this->unit_price : null;
     }
 
     public function setUnitPrice(float $unit_price): static
     {
-        $this->unit_price = $unit_price;
+        $this->unit_price = (string) $unit_price;
         return $this;
     }
 

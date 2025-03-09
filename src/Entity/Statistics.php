@@ -23,7 +23,7 @@ class Statistics
     private ?\DateTimeInterface $calculated_at = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?float $value = null;
+    private ?string $value = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -66,12 +66,12 @@ class Statistics
 
     public function getValue(): ?float
     {
-        return $this->value;
+        return $this->value !== null ? (float) $this->value : null;
     }
 
     public function setValue(float $value): static
     {
-        $this->value = $value;
+        $this->value = (string) $value;
         return $this;
     }
 
