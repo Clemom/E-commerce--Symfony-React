@@ -46,4 +46,9 @@ class ProductService
 
         return true;
     }
+
+    public function getProductById(int $id): ?Product
+    {
+        return $this->productRepository->find($id);
+    }
 }

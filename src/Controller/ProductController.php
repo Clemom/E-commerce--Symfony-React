@@ -62,4 +62,24 @@ class ProductController extends AbstractController
 
         return new JsonResponse(['message' => 'Product deleted successfully'], Response::HTTP_OK);
     }
+
+    #[Route('/get/{id}', name: 'get_product', methods: ['GET'])]
+    public function getProduct(int $id): JsonResponse
+    {
+        $product = $this->productService->getProductById($id);
+
+        if (!$product) {
+            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'id' => $product->getId(),
+            'name' => $product->getName(),
+            'description' => $product->getDescription(),
+            'price' => $product->getPrice(),
+            'stock' => $product->getStock(),
+            'image_url' => $product->getImageUrl(),
+            'is_active' => $product->isActive()
+        ], Response::HTTP_OK);
+    }
 }
