@@ -32,4 +32,18 @@ class ProductService
 
         return $product;
     }
+
+    public function deleteProduct(int $id): bool
+    {
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            return false;
+        }
+
+        $this->entityManager->remove($product);
+        $this->entityManager->flush();
+
+        return true;
+    }
 }

@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+
 
 #[Route('/api/products')]
 class ProductController extends AbstractController
@@ -24,7 +26,7 @@ class ProductController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['name'], $data['description'], $data['price'], $data['stock'], $data['image_url'], $data['is_active'])) {
-            return $this->json(['error' => 'Missing parameters'], JsonResponse::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Missing parameters'], Response::HTTP_BAD_REQUEST);
         }
 
         $product = $this->productService->createProduct(
@@ -46,6 +48,18 @@ class ProductController extends AbstractController
                 'image_url' => $product->getImageUrl(),
                 'is_active' => $product->isActive()
             ]
-        ], JsonResponse::HTTP_CREATED);
+        ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/delete/{id}', name: 'delete', methods: ['DELETE'])]
+    public function deleteProduct(int $id): JsonResponse
+    {
+        $result = $this->productService->deleteProduct($id);
+
+        if (!$result) {
+            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(['message' => 'Product deleted successfully'], Response::HTTP_OK);
     }
 }
