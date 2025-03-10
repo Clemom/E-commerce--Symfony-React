@@ -8,9 +8,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Enum\UserRole;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,8 +40,9 @@ class User
     #[ORM\Column]
     private ?bool $is_active = true;
 
-    #[ORM\Column(type: "string", enumType: UserRole::class)]
-    private UserRole $role;
+    #[ORM\Column(type: Types::JSON)]
+    private array $roles = [];
+    
 
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: "user", orphanRemoval: true)]
     private Collection $orders;
@@ -151,6 +154,19 @@ class User
         return $this;
     }
 
+    public function getRoles(): array
+{
+    $roles = $this->roles;
+    $roles[] = 'ROLE_USER'; 
+    return array_unique($roles);
+}
+
+public function setRoles(array $roles): static
+{
+    $this->roles = $roles;
+    return $this;
+}
+
     public function getOrders(): Collection
     {
         return $this->orders;
@@ -164,5 +180,21 @@ class User
     public function getLogs(): Collection
     {
         return $this->logs;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->role->value];
+    }
+    
+
+    public function eraseCredentials(): void
+    {
+        // Symfony requires this method but we don't need to use it
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 }
